@@ -1,4 +1,5 @@
 import { rifa } from '../data/rifa.js'
+import useEstadoNumeros from '../hooks/useEstadoNumeros.js'
 import useSeleccionNumeros from '../hooks/useSeleccionNumeros.js'
 
 import {
@@ -8,24 +9,32 @@ import {
 } from '../utils/rifa.js'
 
 import Icono from './Icono.jsx'
+import '../styles/estados-numeros.css'
 
 export default function SelectorNumeros() {
     const {
-        seleccion,
+        seleccion: seleccionBruta,
         alternar,
         limpiar,
-        total,
     } = useSeleccionNumeros(
         rifa.totalNumeros,
         rifa.precioNumero,
     )
+
+    const { estados, fase } = useEstadoNumeros()
+
+    const cerrada = fase !== null && fase !== 'abierta'
+
+    // Si alguien ya compró un número que tenías elegido, sale de tu selección.
+    const seleccion = seleccionBruta.filter((numero) => !estados[numero])
+    const total = seleccion.length * rifa.precioNumero
 
     const numeros = Array.from(
         { length: rifa.totalNumeros },
         (_, indice) => indice + 1,
     )
 
-    const enlace = crearEnlaceWhatsApp(rifa, seleccion)
+    const enlace = cerrada ? null : crearEnlaceWhatsApp(rifa, seleccion)
 
     return (
         <section
@@ -49,6 +58,14 @@ export default function SelectorNumeros() {
                         disponibilidad por WhatsApp.
                     </p>
                 </div>
+
+                {cerrada && (
+                    <p className="aviso-cerrada" role="status">
+                        {fase === 'finalizada'
+                            ? 'La rifa ya terminó. ¡Gracias por tanto cariño!'
+                            : 'Las inscripciones están cerradas: ya se vendieron todos los números y viene el sorteo.'}
+                    </p>
+                )}
 
                 <div className="seleccion-layout">
                     <div className="tablero">
@@ -82,6 +99,22 @@ export default function SelectorNumeros() {
                                 />
                                 Tu selección
                             </span>
+
+                            <span>
+                                <i
+                                    className="leyenda__punto leyenda__punto--reservado"
+                                    aria-hidden="true"
+                                />
+                                Reservado
+                            </span>
+
+                            <span>
+                                <i
+                                    className="leyenda__punto leyenda__punto--pagado"
+                                    aria-hidden="true"
+                                />
+                                Vendido
+                            </span>
                         </div>
 
                         <div
@@ -91,17 +124,36 @@ export default function SelectorNumeros() {
                             aria-describedby="nota-disponibilidad"
                         >
                             {numeros.map((numero) => {
+                                const estado = estados[numero]
+                                const ocupado = Boolean(estado) || cerrada
                                 const elegido = seleccion.includes(numero)
+
+                                const clases = [
+                                    'numero',
+                                    elegido ? 'numero--seleccionado' : '',
+                                    estado === 'pagado' ? 'numero--pagado' : '',
+                                    estado === 'reservado' ? 'numero--reservado' : '',
+                                ]
+                                    .filter(Boolean)
+                                    .join(' ')
+
+                                const descripcion =
+                                    estado === 'pagado'
+                                        ? ', vendido'
+                                        : estado === 'reservado'
+                                            ? ', reservado'
+                                            : elegido
+                                                ? ', seleccionado'
+                                                : ''
 
                                 return (
                                     <button
-                                        className={`numero${elegido ? ' numero--seleccionado' : ''
-                                            }`}
+                                        className={clases}
                                         key={numero}
                                         type="button"
+                                        disabled={ocupado}
                                         aria-pressed={elegido}
-                                        aria-label={`Número ${numero}${elegido ? ', seleccionado' : ''
-                                            }`}
+                                        aria-label={`Número ${numero}${descripcion}`}
                                         onClick={() => alternar(numero)}
                                     >
                                         <span>{formatoNumero(numero)}</span>
@@ -210,7 +262,9 @@ export default function SelectorNumeros() {
                                 type="button"
                                 disabled
                             >
-                                Elige tus números
+                                {cerrada
+                                    ? 'Inscripciones cerradas'
+                                    : 'Elige tus números'}
                                 <Icono nombre="corazon" />
                             </button>
                         )}

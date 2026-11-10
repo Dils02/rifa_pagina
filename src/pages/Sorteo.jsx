@@ -17,7 +17,7 @@ import useAdmin from '../hooks/useAdmin.js'
 import useRifa from '../hooks/useRifa.js'
 
 import { rotacionGanadora } from '../utils/ruleta.js'
-import Ruleta from '../components/Ruleta.jsx'
+import RuletaSorteo from '../components/RuletaSorteo.jsx'
 
 const clave = modoLocal
     ? 'rifa-local-solicitud-pendiente'
@@ -314,12 +314,17 @@ export default function Sorteo() {
 
             <div className="sorteo-layout">
                 <section className="admin-caja">
-                    <Ruleta
+                    <RuletaSorteo
                         numeros={numeros}
                         rotacion={rotacion}
                         girando={girando}
-                        duracion={duracion}
+                        duracion={duracion / 1000}
                         alTerminar={finalizar}
+                        numeroGanador={
+                            !pidiendo && !girando
+                                ? escena?.numero ?? null
+                                : null
+                        }
                     />
 
                     <div

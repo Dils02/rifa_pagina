@@ -1,7 +1,7 @@
-import afiche from '../assets/afiche-rifa.jpeg'
 import { rifa } from '../data/rifa.js'
 import { formatoMoneda } from '../utils/rifa.js'
 import Icono from './Icono.jsx'
+import '../styles/portada-centrada.css'
 
 export default function Portada() {
     const datos = [
@@ -28,7 +28,7 @@ export default function Portada() {
     return (
         <>
             <section
-                className="portada contenedor"
+                className="portada portada--centrada contenedor"
                 aria-labelledby="titulo-principal"
             >
                 <div className="portada__texto">
@@ -70,52 +70,6 @@ export default function Portada() {
                             Un poquito de ti.
                             <br />
                             <strong>Un gran paso para mí.</strong>
-                        </span>
-                    </div>
-                </div>
-
-                <div className="portada__visual">
-                    <span
-                        className="decoracion decoracion--uno"
-                        aria-hidden="true"
-                    >
-                        ♡
-                    </span>
-
-                    <span
-                        className="decoracion decoracion--dos"
-                        aria-hidden="true"
-                    >
-                        ✧
-                    </span>
-
-                    <a
-                        className="afiche"
-                        href={afiche}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        aria-label="Abrir afiche original de la Gran rifa dulce en otra pestaña"
-                    >
-                        <img
-                            src={afiche}
-                            width="1090"
-                            height="1375"
-                            alt="Afiche de la Gran rifa dulce con sus ocho premios, valor de mil pesos por número y sorteo el 25 de octubre."
-                            fetchPriority="high"
-                        />
-
-                        <span className="afiche__pie">
-                            Un sueño que compartimos
-                            <Icono nombre="corazon" />
-                        </span>
-                    </a>
-
-                    <div className="sello-premios">
-                        <Icono nombre="regalo" />
-
-                        <span>
-                            <strong>8 premios</strong>
-                            <small>y mucho cariño</small>
                         </span>
                     </div>
                 </div>
