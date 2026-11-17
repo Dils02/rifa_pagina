@@ -196,21 +196,16 @@
   font-style: italic;
 }
 
-.portada__lema {
-  max-width: 390px;
-  font-family: var(--fuente-titulo);
-  font-size: 23px;
-  font-style: italic;
-  line-height: 1.4;
-  color: var(--tinta);
+.portada--centrada .portada__lema {
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 480px;
 }
 
-.portada__descripcion {
-  max-width: 450px;
-  margin-top: 19px;
-  color: var(--texto);
-  font-size: 14px;
-  line-height: 1.9;
+.portada--centrada .portada__descripcion {
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 520px;
 }
 
 .portada__acciones {

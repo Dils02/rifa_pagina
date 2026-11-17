@@ -292,6 +292,7 @@ function Panel({ correo }) {
 
     const [editando, setEditando] = useState(null)
     const [cerrando, setCerrando] = useState(false)
+    const [reiniciando, setReiniciando] = useState(false)
 
     const [girando, setGirando] = useState(false)
     const [rotacion, setRotacion] = useState(0)
@@ -395,6 +396,38 @@ function Panel({ correo }) {
             setError(mensajeDe(fallo))
             return
         }
+
+        await cargar()
+    }
+
+    async function reiniciarRifa() {
+        if (girando) return
+
+        const texto = window.prompt(
+            'Esto borra a todos los participantes y los ganadores, y deja los números disponibles. No se puede deshacer.\n\nEscribe REINICIAR para confirmar:',
+        )
+        if (texto?.trim().toUpperCase() !== 'REINICIAR') return
+
+        setReiniciando(true)
+        setError('')
+
+        const { error: fallo } = await supabase.rpc('reiniciar_rifa')
+
+        setReiniciando(false)
+
+        if (fallo) {
+            setError(mensajeDe(fallo))
+            return
+        }
+
+        // Se limpia todo lo de la ruleta anterior. Importante vaciar las
+        // solicitudes, si no la rifa nueva reutilizaría las del sorteo viejo.
+        solicitudes.current = {}
+        animando.current = false
+        setSegmentos(null)
+        setRotacion(0)
+        setResultado(null)
+        setEditando(null)
 
         await cargar()
     }
@@ -641,6 +674,24 @@ function Panel({ correo }) {
                         </ol>
                     </div>
                 )}
+            </section>
+
+            <section className="pa-seccion" aria-labelledby="pa-nueva">
+                <h2 id="pa-nueva" className="pa-subtitulo">Nueva rifa</h2>
+
+                <p className="pa-texto">
+                    Deja los {total || 100} números disponibles, borra participantes y
+                    ganadores, y vuelve a abrir las inscripciones.
+                </p>
+
+                <button
+                    className="pa-boton pa-boton--borde"
+                    type="button"
+                    disabled={girando || reiniciando}
+                    onClick={reiniciarRifa}
+                >
+                    {reiniciando ? 'Reiniciando…' : 'Hacer nueva rifa'}
+                </button>
             </section>
 
             {editando !== null && porNumero[editando] && (
